@@ -1,1 +1,0 @@
-require 'resque/plugins/resque-heroku-scaler'
