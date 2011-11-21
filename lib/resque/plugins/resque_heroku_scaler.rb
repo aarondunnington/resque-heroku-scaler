@@ -80,7 +80,7 @@ module Resque
           Resque.info[:scaling] == active
         end
 
-        def config
+        def configure
           yield Resque::Plugins::ResqueHerokuScaler::Config
         end
 
