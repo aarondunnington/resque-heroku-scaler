@@ -20,17 +20,22 @@ Add the following environment variables to your Heroku environment:
 
 In your Procfile, configure the scaler as a worker process using:
 
+```
 scaler: bundle exec rake resque:scaler:run
+```
 
 To run the scaler process, use the following command. Note, the scaler process
 is intended to run as a single instance.
 
+```
 heroku scale scaler=1
+```
 
 In your development environment, the scaler process can run local worker
 processes using the rush library. To configure, use the following in
 an initializer.
 
+```ruby
 require 'resque/plugins/resque-heroku-scaler'
 
 if Rails.env.development?
@@ -39,6 +44,7 @@ if Rails.env.development?
     c.scale_manager = :local
   end
 end
+```
 
 [rq]: http://github.com/defunkt/resque
 [hk]: http://devcenter.heroku.com/articles/cedar
