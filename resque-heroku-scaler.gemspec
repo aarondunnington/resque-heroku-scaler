@@ -10,11 +10,12 @@ Gem::Specification.new do |s|
   s.email             = "spirogh@gmail.com"
   s.authors           = ["Aaron Dunnington"]
 
-  s.files             = %w( README.md )
+  s.files             = %w( README.md Rakefile LICENSE HISTORY.md )
   s.files            += Dir.glob("lib/**/*")
+  s.files            += Dir.glob("test/**/*")
 
   s.add_dependency "resque", "~> 1.19.0"
-  s.add_dependency "heroku", "~> 2.11.0"
+  s.add_dependency "heroku", "~> 2.14.0"
 
   s.description = <<description
     This gem provides autoscaling behavior for Resque jobs on Heroku.
