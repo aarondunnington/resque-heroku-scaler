@@ -31,6 +31,18 @@ is intended to run as a single instance.
 heroku scale scaler=1
 ```
 
+Require the worker extensions within the app running the workers. For example,
+in lib/tasks/resque.rake.
+
+```ruby
+require 'resque/tasks'
+require 'resque/plugins/resque-heroku-scaler'
+
+task "resque:setup" => :environment do
+  ENV['QUEUE'] = '*'
+end
+```
+
 In your development environment, the scaler process can run local worker
 processes using the rush library. To configure, use the following in
 an initializer.
