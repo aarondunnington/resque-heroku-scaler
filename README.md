@@ -1,8 +1,8 @@
 Resque Heroku Scaler
 ====================
 
-Provides autoscaling for [Resque][rq] workers on [Heroku][hk]. Based on
-previous scaling work developed by [Daniel Huckstep][dh] and
+This [gem][rg] provides autoscaling for [Resque][rq] workers on [Heroku][hk].
+Based on previous scaling work developed by [Daniel Huckstep][dh] and
 [Alexander Murmann][am].
 
 Autoscaling behavior is provided through a separate monitor process. The
@@ -66,7 +66,8 @@ if Rails.env.development?
 end
 ```
 
+[rg]: http://rubygems.org/gems/resque-heroku-scaler
 [rq]: http://github.com/defunkt/resque
 [hk]: http://devcenter.heroku.com/articles/cedar
 [dh]: http://verboselogging.com/2010/07/30/auto-scale-your-resque-workers-on-heroku
-[am]: https://github.com/ajmurmann/resque-heroku-autoscaler
+[am]: http://github.com/ajmurmann/resque-heroku-autoscaler
