@@ -18,6 +18,14 @@ Add the following environment variables to your Heroku environment:
 * HEROKU_USERNAME
 * HEROKU_PASSWORD
 
+Include the scaler tasks in lib/tasks/scaler.rake
+
+```ruby
+require 'resque/plugins/resque_heroku_scaler/tasks'
+
+task "resque:scaler:setup" => :environment
+```
+
 In your Procfile, configure the scaler as a worker process using:
 
 ```
