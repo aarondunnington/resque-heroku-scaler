@@ -43,18 +43,18 @@ module Resque
     end
 
     def wait_for_scale
-      Resque.redis.set("scale:#{self}", true)
+      redis.set("scale:#{self}", true)
       sleep 1 while scaling? and not shutdown?
-      Resque.redis.del("scale:#{self}")
+      redis.del("scale:#{self}")
     end
 
     def unregister_worker
-      Resque.redis.del("scale:#{self}")
+      redis.del("scale:#{self}")
       original_unregister_worker
     end
 
     def scaling?
-      Resque.redis.exists(:scale)
+      redis.exists(:scale)
     end
 
     def self.scaling

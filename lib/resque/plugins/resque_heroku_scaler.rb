@@ -9,8 +9,6 @@ module Resque
           loop do
             begin
               scale
-            rescue RestClient::Exception => ex
-              log "Scale failed with: #{ex.message}"
             rescue Exception => e
               log "Scale failed with #{e.class.name} #{e.message}"
             end
@@ -32,8 +30,8 @@ module Resque
           end
 
           signal_workers
-          start = Time.now
-          wait_for_workers until ready_to_scale(active) or timeout?(start)
+          stop = timeout
+          wait_for_workers until ready_to_scale(active) or timeout?(stop)
           scale_workers(required)
 
         ensure
@@ -68,8 +66,12 @@ module Resque
           Resque.redis.del(:scale)
         end
 
-        def timeout?(start)
-          Time.now >= Resque::Plugins::ResqueHerokuScaler::Config.scale_timeout.seconds.since(start)
+        def timeout?(stop)
+          Time.now >= stop
+        end
+
+        def timeout
+          Time.now + Resque::Plugins::ResqueHerokuScaler::Config.scale_timeout
         end
 
         def pending

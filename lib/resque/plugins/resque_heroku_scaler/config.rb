@@ -31,7 +31,7 @@ module Resque
           default_scale_with(pending)
         end
 
-        def scale_with=(&block)
+        def scale_with=(block)
           @scale_with = block
         end
 
