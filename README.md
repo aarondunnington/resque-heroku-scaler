@@ -28,7 +28,7 @@ Add the following environment variables to your Heroku environment:
 Include the scaler tasks in lib/tasks/scaler.rake
 
 ```ruby
-require 'resque/plugins/resque_heroku_scaler/tasks'
+require 'resque/plugins/heroku_scaler/tasks'
 
 task "resque:scaler:setup" => :environment
 ```
