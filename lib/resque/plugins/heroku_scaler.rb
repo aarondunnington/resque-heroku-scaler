@@ -1,3 +1,10 @@
+require 'resque'
+require 'resque/plugins/heroku_scaler/version'
+require 'resque/plugins/heroku_scaler/config'
+require 'resque/plugins/heroku_scaler/manager'
+require 'resque/plugins/heroku_scaler/worker'
+require 'resque/plugins/heroku_scaler/resque'
+
 module Resque
   module Plugins
 

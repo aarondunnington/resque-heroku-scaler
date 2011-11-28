@@ -1,11 +1,9 @@
-namespace :resque do
-  namespace :scaler do  
-    task :setup
+require 'resque/tasks'
 
-    desc "Start Resque Heroku Scaler process"
-    task :run => :setup do
-      require 'resque/plugins/resque-heroku-scaler'
-      Resque::Plugins::HerokuScaler.run
-    end
+namespace :resque do
+  desc "Start Resque Heroku Scaler process"
+  task :heroku_scaler => :setup do
+    require 'resque-heroku-scaler'
+    Resque::Plugins::HerokuScaler.run
   end
 end

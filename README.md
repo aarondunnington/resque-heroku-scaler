@@ -25,18 +25,19 @@ Add the following environment variables to your Heroku environment:
 * HEROKU_USERNAME
 * HEROKU_PASSWORD
 
-Include the scaler tasks in lib/tasks/scaler.rake
+Include the scaler tasks in a file within lib/tasks (ex: lib/tasks/scaler.rake)
 
 ```ruby
+require 'resque/tasks'
 require 'resque/plugins/heroku_scaler/tasks'
 
-task "resque:scaler:setup" => :environment
+task "resque:setup" => :environment
 ```
 
 In your Procfile, configure the scaler as a worker process using:
 
 ```
-scaler: bundle exec rake resque:scaler:run
+scaler: bundle exec rake resque:heroku_scaler
 ```
 
 To run the scaler process, use the following command. Note, the scaler process
@@ -51,24 +52,28 @@ in lib/tasks/resque.rake.
 
 ```ruby
 require 'resque/tasks'
-require 'resque/plugins/resque-heroku-scaler'
 
 task "resque:setup" => :environment do
+  require 'resque-heroku-scaler'
   ENV['QUEUE'] = '*'
 end
 ```
 
 In your development environment, the scaler process can run local worker
-processes using the rush library. To configure, use the following in
-an initializer.
+processes using the rush library. To configure, update your scaler file in
+lib/tasks to use the local scale manager below (ex: lib/tasks/scaler.rake).
 
 ```ruby
-require 'resque/plugins/resque-heroku-scaler'
+require 'resque/tasks'
+require 'resque/plugins/heroku_scaler/tasks'
 
-if Rails.env.development?
-  ENV["RUSH_PATH"] ||= File.expand_path('/path/to/app', __FILE__)
-  Resque::Plugins::HerokuScaler.configure do |c|
-    c.scale_manager = :local
+task "resque:setup" => :environment do
+  if Rails.env.development?
+    require 'resque-heroku-scaler'
+    ENV["RUSH_PATH"] ||= File.expand_path('/path/to/app', __FILE__)
+    Resque::Plugins::HerokuScaler.configure do |c|
+      c.scale_manager = :local
+    end
   end
 end
 ```
