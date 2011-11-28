@@ -10,7 +10,14 @@ scaler monitor process polls for pending jobs against the specified Resque
 Redis backend at a configurable interval. The scaler process runs as a worker
 process on Heroku.
 
-##Setup
+Blog Post
+---------
+
+For details on the motivation behind using a separate scaler process, please
+see [this post][ad].
+
+Setup
+-----
 
 Add the following environment variables to your Heroku environment:
 
@@ -71,3 +78,4 @@ end
 [hk]: http://devcenter.heroku.com/articles/cedar
 [dh]: http://verboselogging.com/2010/07/30/auto-scale-your-resque-workers-on-heroku
 [am]: http://github.com/ajmurmann/resque-heroku-autoscaler
+[ad]: http://www.dunnington.net/entry/autoscale-resque-workers-on-heroku
