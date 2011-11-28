@@ -1,6 +1,6 @@
 module Resque
   module Plugins
-    module ResqueHerokuScaler
+    module HerokuScaler
       module Manager
         extend self
 
@@ -9,7 +9,7 @@ module Resque
         end
 
         def init_manager
-          handler = Resque::Plugins::ResqueHerokuScaler::Config.scale_manager
+          handler = Resque::Plugins::HerokuScaler::Config.scale_manager
           return handler unless [Symbol, Array, String].include? handler.class
 
           options = {}

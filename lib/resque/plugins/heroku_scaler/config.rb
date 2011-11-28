@@ -1,6 +1,6 @@
 module Resque
   module Plugins
-    module ResqueHerokuScaler
+    module HerokuScaler
       module Config
         extend self
 

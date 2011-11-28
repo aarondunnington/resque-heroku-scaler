@@ -1,7 +1,7 @@
 module Resque
   module Plugins
 
-    module ResqueHerokuScaler
+    module HerokuScaler
       class << self
 
         def run
@@ -39,23 +39,23 @@ module Resque
         end
 
         def wait_for_scale
-          sleep Resque::Plugins::ResqueHerokuScaler::Config.scale_interval
+          sleep Resque::Plugins::HerokuScaler::Config.scale_interval
         end
 
         def wait_for_workers
-          sleep Resque::Plugins::ResqueHerokuScaler::Config.poll_interval
+          sleep Resque::Plugins::HerokuScaler::Config.poll_interval
         end
 
         def scale_for(pending)
-          Resque::Plugins::ResqueHerokuScaler::Config.scale_for(pending)
+          Resque::Plugins::HerokuScaler::Config.scale_for(pending)
         end
 
         def scale_workers(qty)
-          Resque::Plugins::ResqueHerokuScaler::Manager.workers = qty
+          Resque::Plugins::HerokuScaler::Manager.workers = qty
         end
 
         def workers
-          Resque::Plugins::ResqueHerokuScaler::Manager.workers
+          Resque::Plugins::HerokuScaler::Manager.workers
         end
 
         def signal_workers
@@ -71,7 +71,7 @@ module Resque
         end
 
         def timeout
-          Time.now + Resque::Plugins::ResqueHerokuScaler::Config.scale_timeout
+          Time.now + Resque::Plugins::HerokuScaler::Config.scale_timeout
         end
 
         def pending
@@ -83,7 +83,7 @@ module Resque
         end
 
         def configure
-          yield Resque::Plugins::ResqueHerokuScaler::Config
+          yield Resque::Plugins::HerokuScaler::Config
         end
 
         def startup

@@ -1,9 +1,9 @@
 require 'test_helper'
 
-class ResqueHerokuScalerTest < MiniTest::Unit::TestCase
+class HerokuScalerTest < MiniTest::Unit::TestCase
   def setup
-    @scaler = Resque::Plugins::ResqueHerokuScaler
-    @config = Resque::Plugins::ResqueHerokuScaler::Config
+    @scaler = Resque::Plugins::HerokuScaler
+    @config = Resque::Plugins::HerokuScaler::Config
 
     @redis = mock('Mock Redis')
     @redis.stubs(:set).with(:scale, true).returns(true)
@@ -11,7 +11,7 @@ class ResqueHerokuScalerTest < MiniTest::Unit::TestCase
     Resque.stubs(:redis).returns(@redis)
 
     @manager = mock('Mock Manager')
-    Resque::Plugins::ResqueHerokuScaler::Manager.stubs(:instance).returns(@manager)
+    Resque::Plugins::HerokuScaler::Manager.stubs(:instance).returns(@manager)
   end
 
   def test_no_scale_for_zero_jobs

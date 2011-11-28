@@ -1,7 +1,7 @@
 module Resque
   module Plugins
-    module ResqueHerokuScaler
-      Version = VERSION = "0.2.1"
+    module HerokuScaler
+      Version = VERSION = "0.3.0"
     end
   end
 end

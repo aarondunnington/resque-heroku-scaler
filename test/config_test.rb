@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ConfigTest < MiniTest::Unit::TestCase
   def setup
-    @config = Resque::Plugins::ResqueHerokuScaler::Config
+    @config = Resque::Plugins::HerokuScaler::Config
   end
 
   def test_scale_manager_default

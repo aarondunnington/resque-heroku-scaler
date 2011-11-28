@@ -67,7 +67,7 @@ require 'resque/plugins/resque-heroku-scaler'
 
 if Rails.env.development?
   ENV["RUSH_PATH"] ||= File.expand_path('/path/to/app', __FILE__)
-  Resque::Plugins::ResqueHerokuScaler.configure do |c|
+  Resque::Plugins::HerokuScaler.configure do |c|
     c.scale_manager = :local
   end
 end
