@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.files            += Dir.glob("test/**/*")
 
   s.add_dependency "resque", "~> 1.19.0"
-  s.add_dependency "heroku", "~> 2.17.0"
+  s.add_dependency "heroku", "~> 2.18.1"
 
   s.description = <<description
     This gem provides autoscaling for Resque workers on Heroku.
