@@ -121,7 +121,7 @@ module Resque
             exit
           end
           log "Starting scaler"
-          resume_workers
+          unlock
         end
 
         def log(message)
