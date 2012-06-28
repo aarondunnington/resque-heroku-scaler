@@ -1,18 +1,23 @@
 module Resque
-
+  
   class Worker
-    alias_method :original_unregister_worker, :unregister_worker
-    
+
     def work(interval = 5.0, &block)
       interval = Float(interval)
       $0 = "resque: Starting"
       startup
 
       loop do
-        wait_for_scale if scaling?
         break if shutdown?
+        
+        if should_lock?
+          lock
+          break
+        end
 
-        if not paused? and job = reserve
+        pause if should_pause?
+
+        if job = reserve(interval)
           log "got: #{job.inspect}"
           job.worker = self
           run_hook :before_fork, job
@@ -32,54 +37,57 @@ module Resque
           @child = nil
         else
           break if interval.zero?
-          log! "Sleeping for #{interval} seconds"
+          log! "Timed out after #{interval} seconds"
           procline paused? ? "Paused" : "Waiting for #{@queues.join(',')}"
-          sleep interval
         end
       end
 
     ensure
       unregister_worker
+      wait_for_shutdown if locked?
     end
 
-    def wait_for_scale
-      redis.set("scale:#{self}", true)
-      sleep 1 while scaling? and not shutdown?
-      redis.del("scale:#{self}")
+    def should_lock?
+      redis.exists(:lock)
     end
 
-    def unregister_worker
-      redis.del("scale:#{self}")
-      original_unregister_worker
+    def lock
+      redis.sadd(:locked, self)
+      @locked = true
     end
 
-    def scaling?
-      redis.exists(:scale)
+    def locked?
+      @locked
     end
 
-    def self.scaling
-      names = all
-      return [] unless names.any?
+    def should_unlock?
+      return false if should_lock?
+      locked?
+    end
 
-      names.map! { |name| "scale:#{name}" }
+    def wait_for_shutdown
+      sleep 0.1 until shutdown? or should_unlock?
+    end
 
-      reportedly_scaling = {}
+    def self.locked
+      Array(redis.smembers(:locked))
+    end
 
-      begin
-        reportedly_scaling = redis.mapped_mget(*names).reject do |key, value|
-          value.nil? || value.empty?
-        end
-      rescue Redis::Distributed::CannotDistribute
-        names.each do |name|
-          value = redis.get name
-          reportedly_scaling[name] = value unless value.nil? || value.empty?
-        end
+    def self.lock
+      redis.set(:lock, true)
+    end
+
+    def self.unlock
+      redis.del(:lock)
+      redis.del(:locked)
+    end
+
+    def self.prune
+      all_workers = Worker.all
+      all_workers.each do |worker|
+        worker.unregister_worker
       end
-
-      reportedly_scaling.keys.map do |key|
-        find key.sub("scale:", '')
-      end.compact
     end
-  end
 
+  end
 end

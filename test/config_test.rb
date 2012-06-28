@@ -10,7 +10,7 @@ class ConfigTest < MiniTest::Unit::TestCase
   end
 
   def test_scale_interval_default
-    assert_equal 60, @config.scale_interval
+    assert_equal 5, @config.scale_interval
   end
   
   def test_poll_interval_default
@@ -44,7 +44,7 @@ class ConfigTest < MiniTest::Unit::TestCase
   def test_scale_interval
     @config.scale_interval = 99
     assert_equal 99, @config.scale_interval
-    @config.scale_interval = 60
+    @config.scale_interval = 5
   end
 
   def test_poll_interval

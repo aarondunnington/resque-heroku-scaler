@@ -29,28 +29,19 @@ module Resque
 
           return if required == active
 
-          log "Scale workers from #{active} to #{required}"
-
           if required > active
+            log "Scale workers from #{active} to #{required}"
             scale_workers(required)
             return
           end
+                      
+          return if pending?
 
-          signal_workers
-          stop = timeout
-          wait_for_workers until ready_to_scale(active) or timeout?(stop)
-          scale_workers(required)
-
-        ensure
-          resume_workers
+          scale_down(active)
         end
 
         def wait_for_scale
           sleep Resque::Plugins::HerokuScaler::Config.scale_interval
-        end
-
-        def wait_for_workers
-          sleep Resque::Plugins::HerokuScaler::Config.poll_interval
         end
 
         def scale_for(pending)
@@ -61,32 +52,62 @@ module Resque
           Resque::Plugins::HerokuScaler::Manager.workers = qty
         end
 
+        def scale_down(active)
+          log "Scale #{active} workers down"
+
+          lock
+
+          timeout = Time.now + Resque::Plugins::HerokuScaler::Config.scale_timeout
+          until locked == active or Time.now >= timeout
+            sleep Resque::Plugins::HerokuScaler::Config.poll_interval
+          end
+
+          scale_workers(0)
+
+          timeout = Time.now + Resque::Plugins::HerokuScaler::Config.scale_timeout
+          until Time.now >= timeout
+            if offline?
+              log "#{active} workers scaled down successfully"
+              prune
+              break
+            end
+            sleep Resque::Plugins::HerokuScaler::Config.poll_interval
+          end
+
+        ensure
+          unlock
+        end
+
         def workers
           Resque::Plugins::HerokuScaler::Manager.workers
         end
-
-        def signal_workers
-          Resque.redis.set(:scale, true)
+        
+        def offline?
+          workers.zero?
         end
 
-        def resume_workers
-          Resque.redis.del(:scale)
-        end
-
-        def timeout?(stop)
-          Time.now >= stop
-        end
-
-        def timeout
-          Time.now + Resque::Plugins::HerokuScaler::Config.scale_timeout
+        def pending?
+          pending > 0
         end
 
         def pending
-          Resque.info[:pending].to_i
+          Resque.info[:pending]
         end
 
-        def ready_to_scale(active)
-          Resque.info[:scaling] == active
+        def lock
+          Resque.lock
+        end
+
+        def unlock
+          Resque.unlock
+        end
+        
+        def locked
+          Resque.info[:locked]
+        end
+        
+        def prune
+          Resque.prune
         end
 
         def configure

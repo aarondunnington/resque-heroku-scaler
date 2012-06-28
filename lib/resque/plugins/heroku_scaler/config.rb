@@ -15,7 +15,7 @@ module Resque
         end
 
         def scale_interval
-          @scale_interval || 60
+          @scale_interval || 5
         end
 
         def poll_interval

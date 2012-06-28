@@ -6,8 +6,8 @@ class HerokuScalerTest < MiniTest::Unit::TestCase
     @config = Resque::Plugins::HerokuScaler::Config
 
     @redis = mock('Mock Redis')
-    @redis.stubs(:set).with(:scale, true).returns(true)
-    @redis.stubs(:del).with(:scale).returns(true)
+    @redis.stubs(:set).with(:lock, true).returns(true)
+    @redis.stubs(:del).with(:lock).returns(true)
     Resque.stubs(:redis).returns(@redis)
 
     @manager = mock('Mock Manager')
@@ -15,14 +15,14 @@ class HerokuScalerTest < MiniTest::Unit::TestCase
   end
 
   def test_no_scale_for_zero_jobs
-    Resque.stubs(:info).returns({ :pending => 0, :scaling => 0 })
+    Resque.stubs(:info).returns({ :pending => 0, :locked => 0 })
     @manager.expects(:workers).returns(0)
     @manager.expects(:workers=).never
     @scaler.scale()
   end
 
   def test_scale_up_for_pending_job
-    Resque.stubs(:info).returns({ :pending => 1, :scaling => 0 })
+    Resque.stubs(:info).returns({ :pending => 1, :locked => 0 })
     @manager.expects(:workers).returns(0)
     @manager.expects(:workers=).with(1)
     @scaler.scale()
@@ -30,17 +30,25 @@ class HerokuScalerTest < MiniTest::Unit::TestCase
 
   def test_scale_down_timeout
     @config.scale_timeout = 1
-    Resque.stubs(:info).returns({ :pending => 0, :scaling => 0 })
+    Resque.stubs(:info).returns({ :pending => 0, :locked => 1 })
     @manager.expects(:workers).returns(1)
     @manager.expects(:workers=).with(0)
+    @scaler.expects(:offline?).returns(false)
+    @scaler.expects(:prune).never
+    @scaler.expects(:lock).returns(true)
+    @scaler.expects(:unlock).returns(true)      
     @scaler.scale()
     @config.scale_timeout = 90
   end
 
   def test_scale_down_for_zero_jobs
-    Resque.stubs(:info).returns({ :pending => 0, :scaling => 1 })
+    Resque.stubs(:info).returns({ :pending => 0, :locked => 1 })
     @manager.expects(:workers).returns(1)
     @manager.expects(:workers=).with(0)
+    @scaler.expects(:offline?).returns(true)
+    @scaler.expects(:prune).returns(true)
+    @scaler.expects(:lock).returns(true)
+    @scaler.expects(:unlock).returns(true)
     @scaler.scale()
   end
 
