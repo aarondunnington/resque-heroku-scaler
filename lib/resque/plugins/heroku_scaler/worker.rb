@@ -9,15 +9,13 @@ module Resque
 
       loop do
         break if shutdown?
-        
+
         if should_lock?
           lock
           break
         end
 
-        pause if should_pause?
-
-        if job = reserve(interval)
+        if not paused? and job = reserve
           log "got: #{job.inspect}"
           job.worker = self
           run_hook :before_fork, job
@@ -37,8 +35,9 @@ module Resque
           @child = nil
         else
           break if interval.zero?
-          log! "Timed out after #{interval} seconds"
+          log! "Sleeping for #{interval} seconds"
           procline paused? ? "Paused" : "Waiting for #{@queues.join(',')}"
+          sleep interval
         end
       end
 
