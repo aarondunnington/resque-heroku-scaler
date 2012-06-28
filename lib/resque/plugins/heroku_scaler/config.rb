@@ -19,7 +19,7 @@ module Resque
         end
 
         def poll_interval
-          @poll_interval || 5
+          @poll_interval || 1
         end
 
         def scale_timeout
